@@ -1,1 +1,334 @@
-ahlan
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏆 عـالـمنـا | 3alamna - مُلتقى الأوائل والنخبة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --primary: #38bdf8; 
+            --primary-dark: #0284c7;
+            --bg: #020617; 
+            --card: rgba(15, 23, 42, 0.85);
+            --border: rgba(56, 189, 248, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        
+        body { 
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(30, 144, 255, 0.1) 0%, transparent 40%);
+            color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+
+        .auth-container { 
+            background: var(--card); backdrop-filter: blur(25px); padding: 30px; 
+            border-radius: 32px; border: 1px solid var(--border); 
+            width: 100%; max-width: 500px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .profile-upload { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
+        #profile-preview { 
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; 
+            border: 3px solid var(--primary); padding: 3px; background: #000;
+        }
+        .upload-icon { 
+            position: absolute; bottom: 5px; right: 5px; background: var(--primary); 
+            width: 35px; height: 35px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--bg);
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px; }
+        .slogan { color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px; }
+
+        .auth-form { display: none; text-align: right; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full-width { grid-column: span 2; }
+
+        .form-group { margin-bottom: 15px; position: relative; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--primary); margin-bottom: 5px; margin-right: 5px; font-weight: 600; }
+        
+        input, select { 
+            width: 100%; padding: 12px 15px 12px 40px; border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.6); 
+            color: white; outline: none; font-size: 0.9rem; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); background: rgba(0, 0, 0, 0.4); }
+        .form-group i { position: absolute; left: 15px; bottom: 14px; color: var(--primary); font-size: 0.9rem; }
+
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+        .btn { 
+            width: 100%; padding: 15px; border-radius: 14px; border: none; 
+            cursor: pointer; font-weight: 700; font-size: 1rem; 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: #fff; transition: 0.3s; margin-top: 10px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
+
+        .footer-link { display: block; margin-top: 15px; color: var(--primary); text-decoration: none; font-size: 0.85rem; cursor: pointer; text-align: center; }
+
+        #otp-modal {
+            display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .otp-box { background: #1e293b; padding: 40px; border-radius: 24px; text-align: center; border: 1px solid var(--primary); max-width: 380px; width: 100%; }
+        
+        #loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px;">جاري معالجة البيانات...</p>
+    </div>
+
+    <div class="auth-container">
+        <div class="profile-upload" id="profile-area" style="display: none;">
+            <img src="https://via.placeholder.com/150" id="profile-preview" alt="Avatar">
+            <label for="profile-input" class="upload-icon"><i class="fas fa-camera" style="font-size: 0.9rem; color: #000;"></i></label>
+            <input type="file" id="profile-input" hidden accept="image/*" onchange="previewImage(this)">
+        </div>
+        <img src="logo.png" id="main-logo" class="logo" style="width: 80px; margin-bottom: 10px;">
+
+        <h1>عالمنا</h1>
+        <p class="slogan">بوابة التعلّم الذكي للمستقبل</p>
+
+        <div id="main-view">
+            <button class="btn" onclick="showForm('signup')">إنشاء حساب طالب</button>
+            <button class="btn" onclick="showForm('login')" style="background: transparent; color: #fff; border: 1px solid var(--primary); margin-top: 12px;">دخول سريع</button>
+        </div>
+
+        <div id="signup-view" class="auth-form">
+            <div class="grid-inputs">
+                <div class="form-group full-width">
+                    <label>الاسم رباعي</label>
+                    <input type="text" id="reg-name" placeholder="أدخل اسمك بالكامل">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="form-group">
+                    <label>رقم الموبايل</label>
+                    <input type="tel" id="reg-phone" placeholder="01xxxxxxxxx">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="form-group">
+                    <label>كلمة السر</label>
+                    <input type="password" id="reg-pass" placeholder="********">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="form-group">
+                    <label>المحافظة</label>
+                    <input type="text" id="reg-city" placeholder="مثال: بني سويف">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <div class="form-group">
+                    <label>المدرسة</label>
+                    <input type="text" id="reg-school" placeholder="اسم مدرستك">
+                    <i class="fas fa-school-flag"></i>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الميلاد</label>
+                    <input type="date" id="reg-dob">
+                </div>
+                <div class="form-group">
+                    <label>النوع</label>
+                    <select id="reg-gender">
+                        <option value="male">ذكر</option>
+                        <option value="female">أنثى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصف الدراسي</label>
+                    <select id="reg-grade">
+                        <option value="1">الأول الثانوي</option>
+                        <option value="2">الثاني الثانوي</option>
+                        <option value="3">الثالث الثانوي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الشعبة</label>
+                    <select id="reg-stream">
+                        <option value="general">عام</option>
+                        <option value="serves">خدمات</option>
+                        <option value="azhr">أزهر</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="sendOTP()">تأكيد وتسجيل</button>
+            <span class="footer-link" onclick="showMain()">رجوع للرئيسية</span>
+        </div>
+
+        <div id="login-view" class="auth-form">
+            <div class="form-group">
+                <label>رقم الموبايل</label>
+                <input type="tel" id="login-phone" placeholder="01xxxxxxxxx">
+                <i class="fas fa-mobile-screen"></i>
+            </div>
+            <div class="form-group">
+                <label>كلمة السر</label>
+                <input type="password" id="login-pass" placeholder="********">
+                <i class="fas fa-key"></i>
+            </div>
+            <button class="btn" onclick="attemptLogin()">دخول آمن</button>
+            <a href="https://wa.me/201159562785" class="footer-link">نسيت كلمة السر؟ الدعم الفني</a>
+            <span class="footer-link" onclick="showMain()">رجوع</span>
+        </div>
+    </div>
+
+    <div id="otp-modal">
+        <div class="otp-box">
+            <h2 style="color: var(--primary);">تأكيد الهوية</h2>
+            <p style="font-size: 0.9rem; margin: 10px 0;">أدخل الكود المكون من 6 أرقام للبدء:</p>
+            <h2 id="fake-code" style="letter-spacing: 8px; font-size: 2.5rem; margin: 20px 0; color: #fff;"></h2>
+            <input type="text" id="otp-input" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 4px;">
+            <button class="btn" style="margin-top: 25px;" onclick="handleFinalRegistration()">فتح حسابي الآن</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCcsXU47AU2uOt8P6PYXwoqySDDJ0nexIY",
+            authDomain: "almna-6b8e4.firebaseapp.com",
+            projectId: "almna-6b8e4",
+            databaseURL: "https://almna-6b8e4-default-rtdb.firebaseio.com",
+            storageBucket: "almna-6b8e4.firebasestorage.app",
+            appId: "1:22935857339:web:d46184d81a3ca9636b619e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // تم تحديث الـ Cloud Name بناءً على الصور المرفقة
+        const CLOUD_NAME = "demg5rgiz"; 
+        const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+        const CLOUDINARY_UPLOAD_PRESET = "3alamna";
+
+        let tempUser = {};
+        let selectedFile = null;
+        let generatedOTP;
+
+        function showForm(id) {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('main-logo').style.display = 'none';
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            document.getElementById(id + '-view').style.display = 'block';
+            if(id === 'signup') document.getElementById('profile-area').style.display = 'block';
+        }
+
+        function showMain() {
+            location.reload();
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => document.getElementById('profile-preview').src = e.target.result;
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        function sendOTP() {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            
+            if(!name || !phone || !pass) return alert("من فضلك، املأ الاسم والموبايل والباسورد!");
+
+            tempUser = {
+                name, phone, pass,
+                city: document.getElementById('reg-city').value,
+                school: document.getElementById('reg-school').value,
+                dob: document.getElementById('reg-dob').value,
+                gender: document.getElementById('reg-gender').value,
+                grade: document.getElementById('reg-grade').value,
+                stream: document.getElementById('reg-stream').value,
+                points: 0,
+                status: "active",
+                role: "student",
+                joinedAt: new Date().toISOString()
+            };
+
+            generatedOTP = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('fake-code').innerText = generatedOTP;
+            document.getElementById('otp-modal').style.display = 'flex';
+        }
+
+        async function handleFinalRegistration() {
+            const inputOTP = document.getElementById('otp-input').value;
+            if(inputOTP != generatedOTP) return alert("الكود خطأ!");
+
+            document.getElementById('loader').style.display = 'flex';
+            
+            try {
+                let imageUrl = "https://res.cloudinary.com/demg5rgiz/image/upload/v1710000000/default_user.png";
+
+                if(selectedFile) {
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                    const clRes = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                    
+                    if (!clRes.ok) {
+                        const errorData = await clRes.json();
+                        throw new Error(errorData.error.message || "فشل رفع الصورة");
+                    }
+                    
+                    const clData = await clRes.json();
+                    imageUrl = clData.secure_url;
+                }
+
+                tempUser.profilePic = imageUrl;
+
+                await db.ref('students/' + tempUser.phone).set(tempUser);
+                
+                localStorage.setItem('userPhone', tempUser.phone);
+                window.location.href = "go.html";
+
+            } catch (error) {
+                console.error("Registration Error:", error);
+                alert("حدث خطأ: " + error.message);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function attemptLogin() {
+            const phone = document.getElementById('login-phone').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            
+            if(!phone || !pass) return alert("أدخل بيانات الدخول!");
+
+            document.getElementById('loader').style.display = 'flex';
+
+            db.ref('students/' + phone).once('value', snap => {
+                const user = snap.val();
+                document.getElementById('loader').style.display = 'none';
+
+                if(user && user.pass === pass) {
+                    if(user.status === "blocked") return alert("⚠️ عذراً، حسابك محظور من قبل الإدارة.");
+                    localStorage.setItem('userPhone', phone);
+                    window.location.href = "go.html";
+                } else {
+                    alert("رقم الموبايل أو كلمة السر غير صحيحة!");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
