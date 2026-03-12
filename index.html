@@ -38,7 +38,6 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* الصورة الدائرية الفخمة */
         .profile-upload { position: relative; width: 130px; height: 130px; margin: 0 auto 20px; }
         #profile-preview { 
             width: 130px; height: 130px; border-radius: 50%; object-fit: cover; 
@@ -285,6 +284,7 @@
             const phone = document.getElementById('reg-phone').value.trim();
             const nid = document.getElementById('reg-nid').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
+            const grade = document.getElementById('reg-grade').value;
 
             // التحقق من البيانات
             if(!name || phone.length < 11 || nid.length < 14 || !pass) {
@@ -296,19 +296,26 @@
                 return alert("خطأ في الرقم القومي! يجب أن يبدأ بـ 2 أو 3.");
             }
 
+            // تحديد الـ Role بناءً على اختيار المستوى الدراسي
+            let assignedRole = "student";
+            if(grade === "teacher") {
+                assignedRole = "teacher";
+            }
+
             tempUser = {
                 name, phone, nid, pass,
                 city: document.getElementById('reg-city').value,
                 school: document.getElementById('reg-school').value,
                 dob: document.getElementById('reg-dob').value,
                 gender: document.getElementById('reg-gender').value,
-                grade: document.getElementById('reg-grade').value,
+                grade: grade,
                 system: document.getElementById('reg-system').value,
                 hobby: document.getElementById('reg-hobby').value,
                 referralUsed: document.getElementById('reg-ref').value.trim().toUpperCase(),
                 myCode: generateUniqueRef(),
                 points: 0,
-                status: "pending",
+                status: "active", // الحالة الافتراضية نشط كما طلبت
+                role: assignedRole, // الرول الافتراضي (طالب أو معلم)
                 joinedAt: new Date().toISOString()
             };
 
@@ -341,9 +348,10 @@
                 tempUser.profilePic = "https://res.cloudinary.com/demg5rgiz/image/upload/v1710000000/default.png";
                 
                 await db.ref('students/' + tempUser.phone).set(tempUser);
-                document.getElementById('signup-view').style.display = 'none';
-                document.getElementById('profile-area').style.display = 'none';
-                document.getElementById('pending-msg').style.display = 'block';
+                
+                // في حالة الحالة نشطة، نقوم بتوجيه المستخدم مباشرة أو عرض رسالة ترحيب
+                localStorage.setItem('userPhone', tempUser.phone);
+                window.location.href = "go.html";
 
             } catch (e) { alert(e.message); }
             finally { document.getElementById('loader').style.display = 'none'; }
@@ -359,11 +367,11 @@
                 document.getElementById('loader').style.display = 'none';
                 const user = snap.val();
                 if(user && user.pass === pass) {
-                    if(user.status === "pending") {
+                    if(user.status === "blocked") {
+                        alert("⚠️ عذراً، حسابك محظور نهائياً ولا يمكنك الدخول.");
+                    } else if(user.status === "pending") {
                         document.getElementById('login-view').style.display = 'none';
                         document.getElementById('pending-msg').style.display = 'block';
-                    } else if(user.status === "blocked") {
-                        alert("⚠️ عذراً، حسابك محظور.");
                     } else {
                         localStorage.setItem('userPhone', phone);
                         window.location.href = "go.html";
