@@ -38,19 +38,23 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* الصورة الدائرية الفخمة */
         .profile-upload { position: relative; width: 130px; height: 130px; margin: 0 auto 20px; }
         #profile-preview { 
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; 
+            width: 130px; height: 130px; border-radius: 50%; object-fit: cover; 
             border: 3px solid var(--primary); padding: 4px; background: #000;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+            display: block;
         }
         .upload-icon { 
             position: absolute; bottom: 5px; right: 5px; background: var(--primary); 
-            width: 35px; height: 35px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--bg);
+            width: 38px; height: 38px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--bg);
+            transition: 0.3s;
         }
+        .upload-icon:hover { transform: scale(1.1); background: var(--primary-dark); }
 
-        h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; color: #fff; }
+        h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
         .slogan { color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px; }
 
         .auth-form { display: none; text-align: right; }
@@ -69,7 +73,7 @@
             border: 1px solid rgba(255,255,255,0.1); background: var(--input-bg); 
             color: white; outline: none; font-size: 0.9rem; transition: 0.3s;
         }
-        input:focus, select:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
+        input:focus, select:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
         .form-group i { position: absolute; left: 14px; bottom: 13px; color: var(--primary); font-size: 1rem; }
 
         .btn { 
@@ -107,55 +111,55 @@
         <div id="pending-msg" class="status-msg">
             <i class="fas fa-user-clock fa-2x"></i>
             <h3 style="margin-top: 10px;">طلبك قيد المراجعة</h3>
-            <p style="font-size: 0.85rem; margin-top: 5px;">أهلاً بك! تم استلام بياناتك بنجاح. يقوم فريق "كريم عمر" الآن بمراجعة الطلب لضمان جودة المنصة. سيتم تفعيل حسابك قريباً.</p>
+            <p style="font-size: 0.85rem; margin-top: 5px;">أهلاً بك! تم استلام بياناتك بنجاح. يقوم فريق "كريم عمر" الآن بمراجعة الطلب لضمان جودة المجتمع التعليمي. سيتم تفعيل حسابك قريباً.</p>
             <button class="btn" onclick="location.reload()" style="background: var(--accent); margin-top: 15px; font-size: 0.9rem;">تحديث الحالة</button>
         </div>
 
         <div class="profile-upload" id="profile-area" style="display: none;">
             <img src="https://via.placeholder.com/150" id="profile-preview" alt="Avatar">
-            <label for="profile-input" class="upload-icon"><i class="fas fa-pen"></i></label>
+            <label for="profile-input" class="upload-icon"><i class="fas fa-camera"></i></label>
             <input type="file" id="profile-input" hidden accept="image/*" onchange="previewImage(this)">
         </div>
 
         <div id="welcome-header">
             <h1>عـالـمنـا</h1>
-            <p class="slogan">Social Media & Pro Learning Hub</p>
+            <p class="slogan">🏆 منصة النخبة التعليمية | 3alamna</p>
         </div>
 
         <div id="main-view">
             <button class="btn" onclick="showForm('signup')">
-                <i class="fas fa-user-plus"></i> إنشاء حساب جديد
+                <i class="fas fa-user-plus"></i> إنشاء حساب (نخبة)
             </button>
             <button class="btn" onclick="showForm('login')" style="background: transparent; border: 2px solid var(--primary); margin-top: 15px;">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                <i class="fas fa-sign-in-alt"></i> دخول الأعضاء
             </button>
         </div>
 
         <div id="signup-view" class="auth-form">
             <div class="grid-inputs">
                 <div class="form-group full-width">
-                    <label>الاسم الرباعي</label>
-                    <input type="text" id="reg-name" placeholder="أدخل اسمك بالكامل">
+                    <label>الاسم الرباعي (عربي)</label>
+                    <input type="text" id="reg-name" placeholder="اكتب اسمك بالكامل">
                     <i class="fas fa-address-card"></i>
                 </div>
                 <div class="form-group">
                     <label>رقم الموبايل</label>
-                    <input type="tel" id="reg-phone" placeholder="01xxxxxxxxx">
+                    <input type="tel" id="reg-phone" placeholder="رقم الواتساب">
                     <i class="fas fa-phone"></i>
                 </div>
                 <div class="form-group">
-                    <label>الرقم القومي (14 رقم)</label>
-                    <input type="number" id="reg-nid" placeholder="29000000000000">
+                    <label>الرقم القومي</label>
+                    <input type="number" id="reg-nid" placeholder="من البطاقه او شهادة الميلاد">
                     <i class="fas fa-id-badge"></i>
                 </div>
                 <div class="form-group">
                     <label>كلمة السر</label>
-                    <input type="password" id="reg-pass" placeholder="اختر كلمة سر قوية">
+                    <input type="password" id="reg-pass" placeholder="اختار كلمة سر قويه">
                     <i class="fas fa-lock"></i>
                 </div>
                 <div class="form-group">
-                    <label>المحافظة</label>
-                    <input type="text" id="reg-city" placeholder="بني سويف">
+                    <label>المحافظة و المنطقه</label>
+                    <input type="text" id="reg-city" placeholder="المحافظه و المنطقه">
                     <i class="fas fa-map-marker-alt"></i>
                 </div>
                 <div class="form-group">
@@ -194,19 +198,24 @@
                     </select>
                 </div>
                 <div class="form-group full-width">
-                    <label>كود الصديق (اختياري لربح 20 نقطة)</label>
-                    <input type="text" id="reg-ref" placeholder="3AL-XXXXX">
+                    <label>الهواية المفضلة</label>
+                    <input type="text" id="reg-hobby" placeholder="مثال: البرمجة، الرسم، الرياضة">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="form-group full-width">
+                    <label>كود الصديق (اختياري)</label>
+                    <input type="text" id="reg-ref" placeholder="لو مش معاك عادي">
                     <i class="fas fa-user-friends"></i>
                 </div>
             </div>
             <button class="btn" onclick="sendOTP()">إرسال طلب الانضمام</button>
-            <span class="btn" onclick="showMain()" style="background:none; border:none; font-size:0.9rem; color:var(--primary);">رجوع</span>
+            <span class="btn" onclick="showMain()" style="background:none; border:none; font-size:0.9rem; color:var(--primary);">إلغاء والعودة</span>
         </div>
 
         <div id="login-view" class="auth-form">
             <div class="form-group">
                 <label>رقم الموبايل</label>
-                <input type="tel" id="login-phone" placeholder="01xxxxxxxxx">
+                <input type="tel" id="login-phone" placeholder="اكتب رقم موبايلك">
                 <i class="fas fa-mobile-alt"></i>
             </div>
             <div class="form-group">
@@ -214,18 +223,18 @@
                 <input type="password" id="login-pass" placeholder="********">
                 <i class="fas fa-key"></i>
             </div>
-            <button class="btn" onclick="attemptLogin()">دخول للمنصة</button>
+            <button class="btn" onclick="attemptLogin()">دخول آمن</button>
             <span class="btn" onclick="showMain()" style="background:none; border:none; font-size:0.9rem; color:var(--primary);">رجوع</span>
         </div>
     </div>
 
     <div id="otp-modal">
         <div class="otp-box">
-            <h2 style="color: var(--primary);">تأكيد الهوية 🔐</h2>
-            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">أدخل الكود التالي لإتمام الطلب:</p>
-            <h1 id="fake-code" style="letter-spacing: 10px; margin: 20px 0; font-size: 2.5rem;"></h1>
+            <h2 style="color: var(--primary);">تأكيد الطلب 🔐</h2>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">أدخل الكود الظاهر أدناه للتأكد:</p>
+            <h1 id="fake-code" style="letter-spacing: 10px; margin: 20px 0; font-size: 2.5rem; color:#fff;"></h1>
             <input type="text" id="otp-input" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
-            <button class="btn" style="margin-top: 25px;" onclick="handleFinalRegistration()">تأكيد وإرسال للمراجعة</button>
+            <button class="btn" style="margin-top: 25px;" onclick="handleFinalRegistration()">تأكيد وإرسال البيانات</button>
         </div>
     </div>
 
@@ -272,12 +281,20 @@
         }
 
         function sendOTP() {
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const nid = document.getElementById('reg-nid').value;
-            const pass = document.getElementById('reg-pass').value;
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const nid = document.getElementById('reg-nid').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
 
-            if(!name || phone.length < 11 || nid.length < 14 || !pass) return alert("من فضلك أكمل كافة البيانات بشكل صحيح!");
+            // التحقق من البيانات
+            if(!name || phone.length < 11 || nid.length < 14 || !pass) {
+                return alert("أكمل البيانات! (الاسم، الموبايل 11 رقم، القومي 14 رقم)");
+            }
+
+            // شرط الرقم القومي (يبدأ بـ 2 أو 3)
+            if(!nid.startsWith('2') && !nid.startsWith('3')) {
+                return alert("خطأ في الرقم القومي! يجب أن يبدأ بـ 2 أو 3.");
+            }
 
             tempUser = {
                 name, phone, nid, pass,
@@ -287,6 +304,7 @@
                 gender: document.getElementById('reg-gender').value,
                 grade: document.getElementById('reg-grade').value,
                 system: document.getElementById('reg-system').value,
+                hobby: document.getElementById('reg-hobby').value,
                 referralUsed: document.getElementById('reg-ref').value.trim().toUpperCase(),
                 myCode: generateUniqueRef(),
                 points: 0,
@@ -306,9 +324,9 @@
 
             try {
                 const snap = await db.ref('students/' + tempUser.phone).once('value');
-                if(snap.exists()) throw new Error("رقم الهاتف مسجل مسبقاً!");
+                if(snap.exists()) throw new Error("هذا الرقم مسجل بالفعل!");
 
-                // نظام النقاط
+                // نظام النقاط (Referral)
                 if(tempUser.referralUsed) {
                     const users = await db.ref('students').once('value');
                     let refOwner = null;
@@ -320,7 +338,6 @@
                     }
                 }
 
-                // رفع الصورة الافتراضية إذا لم يتم اختيار صورة
                 tempUser.profilePic = "https://res.cloudinary.com/demg5rgiz/image/upload/v1710000000/default.png";
                 
                 await db.ref('students/' + tempUser.phone).set(tempUser);
@@ -335,6 +352,8 @@
         function attemptLogin() {
             const phone = document.getElementById('login-phone').value;
             const pass = document.getElementById('login-pass').value;
+            if(!phone || !pass) return alert("أكمل بيانات الدخول!");
+
             document.getElementById('loader').style.display = 'flex';
             db.ref('students/' + phone).once('value', snap => {
                 document.getElementById('loader').style.display = 'none';
@@ -344,12 +363,12 @@
                         document.getElementById('login-view').style.display = 'none';
                         document.getElementById('pending-msg').style.display = 'block';
                     } else if(user.status === "blocked") {
-                        alert("⚠️ حسابك محظور.");
+                        alert("⚠️ عذراً، حسابك محظور.");
                     } else {
                         localStorage.setItem('userPhone', phone);
                         window.location.href = "go.html";
                     }
-                } else { alert("بيانات خاطئة!"); }
+                } else { alert("بيانات الدخول غير صحيحة!"); }
             });
         }
     </script>
