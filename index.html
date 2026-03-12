@@ -95,23 +95,28 @@
         #loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid #1e293b; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .forgot-pass { display: block; margin-top: 15px; text-align: center; color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .forgot-pass:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top: 15px;">جاري إرسال طلبك للنخبة...</p>
+        <p style="margin-top: 15px;">جاري معالجة طلب النخبة...</p>
     </div>
 
     <div class="auth-container">
-        <img src="logo.png" id="main-logo" style="width: 80px; margin-bottom: 10px;">
+        <img src="logo(1).png" id="main-logo" style="width: 100px; margin-bottom: 10px;">
         
         <div id="pending-msg" class="status-msg">
-            <i class="fas fa-user-clock fa-2x"></i>
-            <h3 style="margin-top: 10px;">طلبك قيد المراجعة</h3>
-            <p style="font-size: 0.85rem; margin-top: 5px;">أهلاً بك! تم استلام بياناتك بنجاح. يقوم فريق "كريم عمر" الآن بمراجعة الطلب لضمان جودة المجتمع التعليمي. سيتم تفعيل حسابك قريباً.</p>
-            <button class="btn" onclick="location.reload()" style="background: var(--accent); margin-top: 15px; font-size: 0.9rem;">تحديث الحالة</button>
+            <i class="fas fa-user-clock fa-3x"></i>
+            <h3 style="margin-top: 15px;">طلبك قيد المراجعة الآن</h3>
+            <p style="font-size: 0.9rem; margin-top: 8px; line-height: 1.6;">
+                أهلاً بك! لقد استلمنا بياناتك. يقوم فريق **كريم عمر** بمراجعة حسابك للتأكد من هويتك كعضو في النخبة. سيتم تفعيل حسابك بمجرد الموافقة.
+            </p>
+            <button class="btn" onclick="location.reload()" style="background: var(--accent); margin-top: 20px; font-size: 0.9rem;">تحديث الحالة</button>
         </div>
 
         <div class="profile-upload" id="profile-area" style="display: none;">
@@ -148,7 +153,7 @@
                 </div>
                 <div class="form-group">
                     <label>الرقم القومي</label>
-                    <input type="number" id="reg-nid" placeholder="من البطاقه او شهادة الميلاد">
+                    <input type="number" id="reg-nid" placeholder="14 رقم">
                     <i class="fas fa-id-badge"></i>
                 </div>
                 <div class="form-group">
@@ -223,6 +228,7 @@
                 <i class="fas fa-key"></i>
             </div>
             <button class="btn" onclick="attemptLogin()">دخول آمن</button>
+            <a href="https://wa.me/201159562785?text=نسيت كلمة سر حسابي في منصة عالمنا" class="forgot-pass" target="_blank">نسيت كلمة السر؟ اضغط هنا</a>
             <span class="btn" onclick="showMain()" style="background:none; border:none; font-size:0.9rem; color:var(--primary);">رجوع</span>
         </div>
     </div>
@@ -286,21 +292,16 @@
             const pass = document.getElementById('reg-pass').value.trim();
             const grade = document.getElementById('reg-grade').value;
 
-            // التحقق من البيانات
             if(!name || phone.length < 11 || nid.length < 14 || !pass) {
                 return alert("أكمل البيانات! (الاسم، الموبايل 11 رقم، القومي 14 رقم)");
             }
 
-            // شرط الرقم القومي (يبدأ بـ 2 أو 3)
             if(!nid.startsWith('2') && !nid.startsWith('3')) {
                 return alert("خطأ في الرقم القومي! يجب أن يبدأ بـ 2 أو 3.");
             }
 
-            // تحديد الـ Role بناءً على اختيار المستوى الدراسي
             let assignedRole = "student";
-            if(grade === "teacher") {
-                assignedRole = "teacher";
-            }
+            if(grade === "teacher") assignedRole = "teacher";
 
             tempUser = {
                 name, phone, nid, pass,
@@ -314,8 +315,8 @@
                 referralUsed: document.getElementById('reg-ref').value.trim().toUpperCase(),
                 myCode: generateUniqueRef(),
                 points: 0,
-                status: "active", // الحالة الافتراضية نشط كما طلبت
-                role: assignedRole, // الرول الافتراضي (طالب أو معلم)
+                status: "pending", // التعديل الجوهري: الحالة دائماً معلقة عند التسجيل
+                role: assignedRole,
                 joinedAt: new Date().toISOString()
             };
 
@@ -333,25 +334,14 @@
                 const snap = await db.ref('students/' + tempUser.phone).once('value');
                 if(snap.exists()) throw new Error("هذا الرقم مسجل بالفعل!");
 
-                // نظام النقاط (Referral)
-                if(tempUser.referralUsed) {
-                    const users = await db.ref('students').once('value');
-                    let refOwner = null;
-                    users.forEach(u => { if(u.val().myCode === tempUser.referralUsed) refOwner = u.key; });
-                    if(refOwner && refOwner !== tempUser.phone) {
-                        const currentP = (await db.ref('students/'+refOwner+'/points').once('value')).val() || 0;
-                        await db.ref('students/'+refOwner+'/points').set(currentP + 10);
-                        tempUser.points = 20;
-                    }
-                }
-
                 tempUser.profilePic = "https://res.cloudinary.com/demg5rgiz/image/upload/v1710000000/default.png";
                 
                 await db.ref('students/' + tempUser.phone).set(tempUser);
                 
-                // في حالة الحالة نشطة، نقوم بتوجيه المستخدم مباشرة أو عرض رسالة ترحيب
-                localStorage.setItem('userPhone', tempUser.phone);
-                window.location.href = "go.html";
+                // الانتقال لرسالة المراجعة بدلاً من الدخول المباشر
+                document.getElementById('signup-view').style.display = 'none';
+                document.getElementById('profile-area').style.display = 'none';
+                document.getElementById('pending-msg').style.display = 'block';
 
             } catch (e) { alert(e.message); }
             finally { document.getElementById('loader').style.display = 'none'; }
@@ -370,9 +360,11 @@
                     if(user.status === "blocked") {
                         alert("⚠️ عذراً، حسابك محظور نهائياً ولا يمكنك الدخول.");
                     } else if(user.status === "pending") {
+                        // إظهار رسالة المراجعة إذا لم يوافق الأدمن بعد
                         document.getElementById('login-view').style.display = 'none';
+                        document.getElementById('welcome-header').style.display = 'none';
                         document.getElementById('pending-msg').style.display = 'block';
-                    } else {
+                    } else if(user.status === "active") {
                         localStorage.setItem('userPhone', phone);
                         window.location.href = "go.html";
                     }
